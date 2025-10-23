@@ -1,0 +1,7 @@
+Flask
+Flask-MongoEngine
+Flask-Cors
+gunicorn
+GitPython
+Jouvence
+python-dotenv
