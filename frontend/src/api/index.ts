@@ -52,3 +52,25 @@ export const createScript = (projectId: string, title: string): Promise<Script> 
 export const deleteScript = (scriptId: string): Promise<void> => {
     return apiFetch<void>(`/scripts/${scriptId}`, { method: 'DELETE' });
 };
+
+// --- Fountain Parser API --- //
+const FOUNTAIN_PARSER_URL = 'http://localhost:4000';
+
+export interface FountainParseResult {
+    html: string;
+}
+
+export const parseFountain = async (fountainText: string): Promise<FountainParseResult> => {
+    const response = await fetch(`${FOUNTAIN_PARSER_URL}/parse`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fountain_text: fountainText }),
+    });
+
+    if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({ error: 'Fountain parser failed' }));
+        throw new Error(errorBody.error || 'Failed to parse Fountain text');
+    }
+
+    return response.json();
+};
