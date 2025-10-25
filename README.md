@@ -82,9 +82,7 @@ mongod --dbpath /path/to/your/data/directory
 ### 3. Set Up Backend (Flask API)
 
 ```bash
-# Navigate to backend directory
-cd backend
-
+# From the Scripto root directory
 # Create virtual environment
 python -m venv venv
 
@@ -99,58 +97,62 @@ pip install -r requirements.txt
 
 # Set environment variables (optional)
 export FLASK_ENV=development
-export MONGODB_URI=mongodb://localhost:27017/scripto
+export SECRET_KEY=your-secret-key-here
 ```
 
 ### 4. Set Up Fountain Parser Service
 
 ```bash
 # Navigate to fountain parser directory
-cd ../fountain_parser_service
+cd fountain_parser_service
 
 # Install dependencies
 npm install
+
+# Go back to root
+cd ..
 ```
 
 ### 5. Set Up Frontend
 
 ```bash
 # Navigate to frontend directory
-cd ../frontend
+cd frontend
 
 # Install dependencies
 npm install
+
+# Go back to root
+cd ..
 ```
 
 ## Running the Application
 
-You need to run three services simultaneously:
+You need to run three services simultaneously. Open three separate terminal windows/tabs:
 
-### Terminal 1: MongoDB
+### Terminal 1: Flask Backend
 ```bash
-# Make sure MongoDB is running
-mongod
-```
-
-### Terminal 2: Flask Backend
-```bash
-cd backend
+# From the Scripto root directory
 source venv/bin/activate  # Activate virtual environment
-python app.py
+python wsgi.py
 ```
 
 The Flask API will start on `http://localhost:5000`
 
-### Terminal 3: Fountain Parser Service
+**Note:** MongoDB must be running before starting the Flask backend!
+
+### Terminal 2: Fountain Parser Service
 ```bash
+# From the Scripto root directory
 cd fountain_parser_service
 node index.js
 ```
 
 The Fountain parser will start on `http://localhost:4000`
 
-### Terminal 4: Frontend Development Server
+### Terminal 3: Frontend Development Server
 ```bash
+# From the Scripto root directory
 cd frontend
 npm run dev
 ```
@@ -168,14 +170,23 @@ http://localhost:5173
 
 ```
 Scripto/
-├── backend/                    # Flask REST API
-│   ├── app.py                 # Main Flask application
-│   ├── requirements.txt       # Python dependencies
-│   └── ...
+├── wsgi.py                    # Flask application entry point
+├── config.py                  # Flask configuration
+├── requirements.txt           # Python dependencies
+├── scriptforge/              # Flask application package
+│   ├── __init__.py           # App factory
+│   ├── models.py             # Database models
+│   ├── api/                  # API routes
+│   │   ├── projects.py       # Project endpoints
+│   │   ├── scripts.py        # Script endpoints
+│   │   ├── git_vc.py         # Git version control
+│   │   └── parser.py         # Parser endpoints
+│   └── services/             # Business logic
+│       ├── fountain_parser.py
+│       └── git_service.py
 ├── fountain_parser_service/   # Fountain format parser
 │   ├── index.js              # Express server
-│   ├── package.json          # Node dependencies
-│   └── ...
+│   └── package.json          # Node dependencies
 ├── frontend/                  # React frontend
 │   ├── src/
 │   │   ├── components/       # React components
@@ -188,11 +199,11 @@ Scripto/
 │   │   │   └── screenplay.ts  # Screenplay formatting logic
 │   │   ├── contexts/        # React contexts
 │   │   │   └── ThemeContext.tsx
-│   │   ├── api/            # API client
-│   │   └── ...
+│   │   └── api/            # API client
 │   ├── package.json        # Node dependencies
 │   └── vite.config.ts      # Vite configuration
-└── README.md              # This file
+├── data/                     # Project data storage (created at runtime)
+└── README.md                # This file
 ```
 
 ## API Endpoints
